@@ -1,0 +1,73 @@
+body {
+font-family: Arial, sans-serif;
+background-color: #f2f2f2;
+margin: 0;
+padding: 20px;
+}
+
+.container {
+width: 600px;
+max-width: 90%;
+margin: auto;
+}
+
+h1 {
+text-align: center;
+color: #333;
+}
+
+.menu {
+background-color: white;
+padding: 20px;
+margin-top: 20px;
+border-radius: 10px;
+box-shadow: 0 2px 5px #ccc;
+}
+
+h2 {
+color: #333;
+}
+
+input {
+width: 95%;
+padding: 10px;
+margin-bottom: 10px;
+border: 1px solid #ccc;
+border-radius: 5px;
+}
+
+button {
+width: 100%;
+padding: 10px;
+background-color: #2563eb;
+color: white;
+border: none;
+border-radius: 5px;
+cursor: pointer;
+}
+
+button:hover {
+background-color: #1d4ed8;
+}
+
+.veiculo {
+background-color: #f2f2f2;
+padding: 10px;
+margin-top: 10px;
+border-radius: 5px;
+}
+
+.resultado {
+background-color: #d1fae5;
+padding: 20px;
+margin-top: 20px;
+border-radius: 10px;
+color: #065f46;
+}
+
+@media (max-width: 600px) {
+.container {
+width: 100%;
+max-width: 100%;
+}
+}
