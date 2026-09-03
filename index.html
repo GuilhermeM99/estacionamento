@@ -1,63 +1,103 @@
 <!DOCTYPE html>
-
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Estacionamento</title>
 
-
-<link rel="stylesheet" href="style.css">
-
-
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
+    <div class="container">
 
-<div class="container">
-
-    <h1>🚗 Estacionamento</h1>
-
-    <div class="menu">
-        <h2>Registrar Entrada</h2>
-
-        <input type="text" id="placaEntrada" placeholder="Digite a placa">
-
-        <button onclick="registrarEntrada()">
-            Registrar Entrada
-        </button>
-    </div>
+        <h1>🚗 Estacionamento</h1>
 
 
-    <div class="menu">
-        <h2>Veículos Estacionados</h2>
+        <!-- REGISTRAR ENTRADA -->
+        <div class="menu">
 
-        <div id="listaVeiculos">
-            <p>Não há veículos estacionados.</p>
+            <h2>Registrar Entrada</h2>
+
+            <input
+                type="text"
+                id="placaEntrada"
+                placeholder="Digite a placa"
+            >
+
+            <button onclick="registrarEntrada()">
+                Registrar Entrada
+            </button>
+
         </div>
+
+
+        <!-- VEÍCULOS ESTACIONADOS -->
+        <div class="menu">
+
+            <h2>Veículos Estacionados</h2>
+
+            <div id="listaVeiculos">
+
+                <p>Não há veículos estacionados.</p>
+
+            </div>
+
+        </div>
+
+
+        <!-- REGISTRAR SAÍDA -->
+        <div class="menu">
+
+            <h2>Registrar Saída</h2>
+
+            <input
+                type="text"
+                id="placaSaida"
+                placeholder="Digite a placa"
+            >
+
+            <button onclick="registrarSaida()">
+                Registrar Saída
+            </button>
+
+        </div>
+
+
+        <!-- RESULTADO DA SAÍDA -->
+        <div id="resultado" class="resultado">
+
+        </div>
+
+
+        <!-- HISTÓRICO -->
+        <div class="menu">
+
+            <h2>Histórico</h2>
+
+            <div id="listaHistorico">
+
+                <p>Não há histórico.</p>
+
+            </div>
+
+            <br>
+
+            <button onclick="limparHistorico()">
+                Limpar Histórico
+            </button>
+
+        </div>
+
+
     </div>
 
 
-    <div class="menu">
-        <h2>Registrar Saída</h2>
-
-        <input type="text" id="placaSaida" placeholder="Digite a placa">
-
-        <button onclick="registrarSaida()">
-            Registrar Saída
-        </button>
-    </div>
-
-
-    <div id="resultado" class="resultado">
-        
-    </div>
-
-</div>
-
-<script src="script.js"></script>
-
+    <script src="script.js"></script>
 
 </body>
+
 </html>
