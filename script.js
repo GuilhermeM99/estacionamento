@@ -3,30 +3,61 @@
 // ==========================================
 
 let veiculos = JSON.parse(localStorage.getItem("veiculos")) || [];
-
 let historico = JSON.parse(localStorage.getItem("historico")) || [];
-
 let ultimoResultado = JSON.parse(
     localStorage.getItem("ultimoResultado")
 ) || null;
 
 
 // ==========================================
-// LIMPAR E FORMATAR PLACA
+// FORMATAR PLACA
 // ==========================================
 
 function formatarPlaca(valor) {
 
-    // Remove tudo que não for letra ou número
-    valor = valor.replace(/[^a-zA-Z0-9]/g, "");
+    return valor
+        .replace(/[^a-zA-Z0-9]/g, "")
+        .toUpperCase()
+        .slice(0, 7);
+}
 
-    // Converte para maiúsculo
-    valor = valor.toUpperCase();
 
-    // Limite máximo de 7 caracteres
-    valor = valor.substring(0, 7);
+// ==========================================
+// CONFIGURAR CAMPOS DE PLACA
+// ==========================================
 
-    return valor;
+function configurarCamposPlaca() {
+
+    const campos = [
+        document.getElementById("placaEntrada"),
+        document.getElementById("placaSaida")
+    ];
+
+    campos.forEach(function (campo) {
+
+        if (!campo) return;
+
+        // Limite HTML
+        campo.setAttribute("maxlength", "7");
+
+        // Impede caracteres inválidos e mais de 7 caracteres
+        campo.addEventListener("input", function () {
+
+            this.value = formatarPlaca(this.value);
+
+        });
+
+        // Corrige também quando houver colagem
+        campo.addEventListener("paste", function () {
+
+            setTimeout(() => {
+
+                this.value = formatarPlaca(this.value);
+
+            }, 0);
+
+        });
+    });
 }
 
 
@@ -36,54 +67,60 @@ function formatarPlaca(valor) {
 
 function registrarEntrada() {
 
-    let campo = document.getElementById("placaEntrada");
+    const campo = document.getElementById("placaEntrada");
 
-    let placa = formatarPlaca(campo.value);
+    if (!campo) {
+        console.error("Campo placaEntrada não encontrado.");
+        return;
+    }
+
+    const placa = formatarPlaca(campo.value);
 
     campo.value = placa;
 
     if (placa === "") {
 
         alert("Digite a placa do veículo!");
-
         return;
     }
 
-    // Verifica limite
     if (placa.length > 7) {
 
         alert("A placa deve ter no máximo 7 caracteres!");
-
         return;
     }
 
     // Verifica se já está estacionado
-    for (let i = 0; i < veiculos.length; i++) {
+    const jaEstacionado = veiculos.some(function (veiculo) {
 
-        if (veiculos[i].placa === placa) {
+        return veiculo.placa === placa;
 
-            alert("Esse veículo já está estacionado!");
+    });
 
-            return;
-        }
+    if (jaEstacionado) {
+
+        alert("Esse veículo já está estacionado!");
+        return;
     }
 
-    // Horário da entrada
-    let entrada = new Date().getTime();
-
-    let veiculo = {
+    // Cria veículo
+    const veiculo = {
 
         placa: placa,
 
-        entrada: entrada
+        entrada: Date.now()
+
     };
 
     veiculos.push(veiculo);
 
+    // Salva
     salvarDados();
 
+    // Limpa campo
     campo.value = "";
 
+    // Atualiza tela
     mostrarVeiculos();
 
     alert("Veículo registrado com sucesso!");
@@ -91,12 +128,14 @@ function registrarEntrada() {
 
 
 // ==========================================
-// MOSTRAR VEÍCULOS
+// MOSTRAR VEÍCULOS ESTACIONADOS
 // ==========================================
 
 function mostrarVeiculos() {
 
-    let lista = document.getElementById("listaVeiculos");
+    const lista = document.getElementById("listaVeiculos");
+
+    if (!lista) return;
 
     lista.innerHTML = "";
 
@@ -108,19 +147,18 @@ function mostrarVeiculos() {
         return;
     }
 
-    for (let i = 0; i < veiculos.length; i++) {
+    veiculos.forEach(function (veiculo) {
 
-        let placa = veiculos[i].placa;
+        const entrada = new Date(veiculo.entrada);
 
-        let entrada = new Date(veiculos[i].entrada);
-
-        let horario = entrada.toLocaleTimeString("pt-BR");
+        const horario = entrada.toLocaleTimeString("pt-BR");
 
         lista.innerHTML +=
+
             "<div class='veiculo'>" +
 
             "<strong>Placa:</strong> " +
-            placa +
+            veiculo.placa +
 
             "<br>" +
 
@@ -128,7 +166,7 @@ function mostrarVeiculos() {
             horario +
 
             "</div>";
-    }
+    });
 }
 
 
@@ -138,144 +176,152 @@ function mostrarVeiculos() {
 
 function registrarSaida() {
 
-    let campo = document.getElementById("placaSaida");
+    const campo = document.getElementById("placaSaida");
 
-    let placa = formatarPlaca(campo.value);
+    if (!campo) {
+        console.error("Campo placaSaida não encontrado.");
+        return;
+    }
+
+    const placa = formatarPlaca(campo.value);
 
     campo.value = placa;
 
     if (placa === "") {
 
         alert("Digite a placa do veículo!");
-
         return;
     }
 
-    // Verifica limite
     if (placa.length > 7) {
 
         alert("A placa deve ter no máximo 7 caracteres!");
-
         return;
     }
 
-    let encontrado = false;
+    const indice = veiculos.findIndex(function (veiculo) {
 
-    for (let i = 0; i < veiculos.length; i++) {
+        return veiculo.placa === placa;
 
-        if (veiculos[i].placa === placa) {
+    });
 
-            encontrado = true;
-
-            // Horário da saída
-            let saida = new Date().getTime();
-
-            // Horário da entrada
-            let entrada = veiculos[i].entrada;
-
-            // Calcula tempo
-            let tempo = saida - entrada;
-
-            let horas = tempo / 3600000;
-
-            // Arredonda para cima
-            horas = Math.ceil(horas);
-
-            // Mínimo de 1 hora
-            if (horas < 1) {
-
-                horas = 1;
-            }
-
-            // ==================================
-            // CALCULA VALOR
-            // ==================================
-
-            let valor;
-
-            if (horas <= 1) {
-
-                valor = 15;
-
-            } else {
-
-                valor = 15 + (horas - 1) * 3;
-            }
-
-            // ==================================
-            // CRIA HISTÓRICO
-            // ==================================
-
-            let registro = {
-
-                placa: placa,
-
-                entrada: entrada,
-
-                saida: saida,
-
-                horas: horas,
-
-                valor: valor
-            };
-
-            historico.push(registro);
-
-            // ==================================
-            // SALVA ÚLTIMO RESULTADO
-            // ==================================
-
-            ultimoResultado = {
-
-                placa: placa,
-
-                horas: horas,
-
-                valor: valor
-            };
-
-            // ==================================
-            // REMOVE VEÍCULO
-            // ==================================
-
-            veiculos.splice(i, 1);
-
-            // ==================================
-            // SALVA DADOS
-            // ==================================
-
-            salvarDados();
-
-            // ==================================
-            // ATUALIZA TELA
-            // ==================================
-
-            mostrarResultado();
-
-            campo.value = "";
-
-            mostrarVeiculos();
-
-            mostrarHistorico();
-
-            break;
-        }
-    }
-
-    if (!encontrado) {
+    if (indice === -1) {
 
         alert("Veículo não encontrado.");
+        return;
     }
+
+    const veiculo = veiculos[indice];
+
+    const entrada = veiculo.entrada;
+
+    const saida = Date.now();
+
+    // ==========================================
+    // CALCULA TEMPO
+    // ==========================================
+
+    const tempo = saida - entrada;
+
+    let horas = Math.ceil(tempo / 3600000);
+
+    if (horas < 1) {
+
+        horas = 1;
+    }
+
+
+    // ==========================================
+    // CALCULA VALOR
+    // ==========================================
+
+    let valor;
+
+    if (horas <= 1) {
+
+        valor = 15;
+
+    } else {
+
+        valor = 15 + (horas - 1) * 3;
+    }
+
+
+    // ==========================================
+    // CRIA REGISTRO DO HISTÓRICO
+    // ==========================================
+
+    const registro = {
+
+        placa: placa,
+
+        entrada: entrada,
+
+        saida: saida,
+
+        horas: horas,
+
+        valor: valor
+
+    };
+
+    historico.push(registro);
+
+
+    // ==========================================
+    // SALVA ÚLTIMO RESULTADO
+    // ==========================================
+
+    ultimoResultado = {
+
+        placa: placa,
+
+        horas: horas,
+
+        valor: valor
+
+    };
+
+
+    // ==========================================
+    // REMOVE DOS ESTACIONADOS
+    // ==========================================
+
+    veiculos.splice(indice, 1);
+
+
+    // ==========================================
+    // SALVA TUDO
+    // ==========================================
+
+    salvarDados();
+
+
+    // ==========================================
+    // ATUALIZA A TELA
+    // ==========================================
+
+    mostrarResultado();
+
+    mostrarVeiculos();
+
+    mostrarHistorico();
+
+    campo.value = "";
+
+    alert("Saída registrada com sucesso!");
 }
 
 
 // ==========================================
-// MOSTRAR RESULTADO
+// MOSTRAR ÚLTIMO RESULTADO
 // ==========================================
 
 function mostrarResultado() {
 
-    let resultado = document.getElementById("resultado");
+    const resultado = document.getElementById("resultado");
+
+    if (!resultado) return;
 
     if (!ultimoResultado) {
 
@@ -308,7 +354,9 @@ function mostrarResultado() {
 
 function mostrarHistorico() {
 
-    let lista = document.getElementById("listaHistorico");
+    const lista = document.getElementById("listaHistorico");
+
+    if (!lista) return;
 
     lista.innerHTML = "";
 
@@ -320,18 +368,16 @@ function mostrarHistorico() {
         return;
     }
 
-    for (let i = 0; i < historico.length; i++) {
+    historico.forEach(function (registro) {
 
-        let registro = historico[i];
+        const entrada = new Date(registro.entrada);
 
-        let entrada = new Date(registro.entrada);
+        const saida = new Date(registro.saida);
 
-        let saida = new Date(registro.saida);
-
-        let horarioEntrada =
+        const horarioEntrada =
             entrada.toLocaleString("pt-BR");
 
-        let horarioSaida =
+        const horarioSaida =
             saida.toLocaleString("pt-BR");
 
         lista.innerHTML +=
@@ -362,7 +408,7 @@ function mostrarHistorico() {
             Number(registro.valor).toFixed(2) +
 
             "</div>";
-    }
+    });
 }
 
 
@@ -398,72 +444,44 @@ function limparHistorico() {
     if (historico.length === 0) {
 
         alert("O histórico já está vazio.");
-
         return;
     }
 
-    let confirmar = confirm(
+    const confirmar = confirm(
         "Tem certeza que deseja apagar todo o histórico?"
     );
 
-    if (confirmar) {
+    if (!confirmar) return;
 
-        historico = [];
+    historico = [];
 
-        ultimoResultado = null;
+    ultimoResultado = null;
 
-        localStorage.removeItem("historico");
+    localStorage.removeItem("historico");
 
-        localStorage.removeItem("ultimoResultado");
+    localStorage.removeItem("ultimoResultado");
 
-        mostrarHistorico();
+    mostrarHistorico();
 
-        mostrarResultado();
+    mostrarResultado();
 
-        alert("Histórico apagado com sucesso!");
-    }
+    alert("Histórico apagado com sucesso!");
 }
 
 
 // ==========================================
-// LIMITAÇÃO DOS CAMPOS DE PLACA
+// INICIALIZAÇÃO
 // ==========================================
 
 document.addEventListener("DOMContentLoaded", function () {
 
-    const placaEntrada =
-        document.getElementById("placaEntrada");
+    configurarCamposPlaca();
 
-    const placaSaida =
-        document.getElementById("placaSaida");
-
-
-    if (placaEntrada) {
-
-        placaEntrada.setAttribute("maxlength", "7");
-
-        placaEntrada.addEventListener("input", function () {
-
-            this.value = formatarPlaca(this.value);
-        });
-    }
-
-
-    if (placaSaida) {
-
-        placaSaida.setAttribute("maxlength", "7");
-
-        placaSaida.addEventListener("input", function () {
-
-            this.value = formatarPlaca(this.value);
-        });
-    }
-
-
-    // Carrega os dados na tela
+    // Recupera tudo depois do F5
     mostrarVeiculos();
 
     mostrarHistorico();
 
     mostrarResultado();
+
 });
