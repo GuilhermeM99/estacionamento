@@ -1,73 +1,117 @@
-body {
-font-family: Arial, sans-serif;
-background-color: #f2f2f2;
-margin: 0;
-padding: 20px;
+* {
+    box-sizing: border-box;
 }
 
-.container {
-width: 600px;
-max-width: 90%;
-margin: auto;
+
+body {
+    margin: 0;
+    padding: 20px;
+
+    font-family: Arial, sans-serif;
+
+    background-color: #f2f2f2;
 }
+
+
+.container {
+    max-width: 700px;
+
+    margin: auto;
+}
+
 
 h1 {
-text-align: center;
-color: #333;
+    text-align: center;
+
+    margin-bottom: 30px;
 }
+
 
 .menu {
-background-color: white;
-padding: 20px;
-margin-top: 20px;
-border-radius: 10px;
-box-shadow: 0 2px 5px #ccc;
+    background-color: white;
+
+    padding: 20px;
+
+    margin-bottom: 20px;
+
+    border-radius: 10px;
+
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-h2 {
-color: #333;
+
+.menu h2 {
+    margin-top: 0;
+
+    margin-bottom: 15px;
 }
+
 
 input {
-width: 95%;
-padding: 10px;
-margin-bottom: 10px;
-border: 1px solid #ccc;
-border-radius: 5px;
+    width: 100%;
+
+    padding: 12px;
+
+    margin-bottom: 10px;
+
+    border: 1px solid #ccc;
+
+    border-radius: 5px;
+
+    font-size: 16px;
 }
+
 
 button {
-width: 100%;
-padding: 10px;
-background-color: #2563eb;
-color: white;
-border: none;
-border-radius: 5px;
-cursor: pointer;
+    width: 100%;
+
+    padding: 12px;
+
+    border: none;
+
+    border-radius: 5px;
+
+    background-color: #333;
+
+    color: white;
+
+    font-size: 16px;
+
+    cursor: pointer;
 }
+
 
 button:hover {
-background-color: #1d4ed8;
+    background-color: #555;
 }
+
 
 .veiculo {
-background-color: #f2f2f2;
-padding: 10px;
-margin-top: 10px;
-border-radius: 5px;
+    background-color: #f5f5f5;
+
+    padding: 15px;
+
+    margin-bottom: 10px;
+
+    border-radius: 5px;
+
+    border-left: 4px solid #333;
 }
+
 
 .resultado {
-background-color: #d1fae5;
-padding: 20px;
-margin-top: 20px;
-border-radius: 10px;
-color: #065f46;
+    background-color: white;
+
+    padding: 20px;
+
+    margin-bottom: 20px;
+
+    border-radius: 10px;
+
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-@media (max-width: 600px) {
-.container {
-width: 100%;
-max-width: 100%;
-}
+
+.resultado h2 {
+    margin-top: 0;
 }
