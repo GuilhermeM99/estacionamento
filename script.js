@@ -1,4 +1,4 @@
-let veiculos = [];
+let veiculos = JSON.parse(localStorage.getItem("veiculos")) || [];
 
 function registrarEntrada() {
 
@@ -31,6 +31,7 @@ let entrada = new Date();
 let veiculo = [placa, entrada];
 
 veiculos.push(veiculo);
+localStorage.setItem("veiculos", JSON.stringify(veiculos));
 
 
 document.getElementById("placaEntrada").value = "";
@@ -156,6 +157,7 @@ for (let i = 0; i < veiculos.length; i++) {
 
         // Remove o veículo da lista
         veiculos.splice(i, 1);
+        localStorage.setItem("veiculos", JSON.stringify(veiculos));
 
 
         document.getElementById("placaSaida").value = "";
