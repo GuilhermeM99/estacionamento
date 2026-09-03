@@ -1,4 +1,7 @@
 let veiculos = JSON.parse(localStorage.getItem("veiculos")) || [];
+for (let i = 0; i <veiculos.length; i++) {
+    veiculos[i][1] = new Data(veiculos[i][1];
+}
 console.log(veiculos);
 
 function registrarEntrada() {
