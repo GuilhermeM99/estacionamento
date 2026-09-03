@@ -1,4 +1,5 @@
 let veiculos = JSON.parse(localStorage.getItem("veiculos")) || [];
+console.log(veiculos);
 
 function registrarEntrada() {
 
