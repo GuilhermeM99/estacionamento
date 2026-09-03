@@ -2,16 +2,32 @@
 // CARREGA OS DADOS SALVOS
 // ==========================================
 
-// Veículos atualmente estacionados
 let veiculos = JSON.parse(localStorage.getItem("veiculos")) || [];
 
-// Histórico dos veículos que já saíram
 let historico = JSON.parse(localStorage.getItem("historico")) || [];
 
-// Último resultado exibido
 let ultimoResultado = JSON.parse(
     localStorage.getItem("ultimoResultado")
 ) || null;
+
+
+// ==========================================
+// LIMPAR E FORMATAR PLACA
+// ==========================================
+
+function formatarPlaca(valor) {
+
+    // Remove tudo que não for letra ou número
+    valor = valor.replace(/[^a-zA-Z0-9]/g, "");
+
+    // Converte para maiúsculo
+    valor = valor.toUpperCase();
+
+    // Limite máximo de 7 caracteres
+    valor = valor.substring(0, 7);
+
+    return valor;
+}
 
 
 // ==========================================
@@ -20,20 +36,34 @@ let ultimoResultado = JSON.parse(
 
 function registrarEntrada() {
 
-    let placa = document.getElementById("placaEntrada").value;
+    let campo = document.getElementById("placaEntrada");
 
-    placa = placa.toUpperCase().trim();
+    let placa = formatarPlaca(campo.value);
 
-    if (placa == "") {
+    campo.value = placa;
+
+    if (placa === "") {
+
         alert("Digite a placa do veículo!");
+
+        return;
+    }
+
+    // Verifica limite
+    if (placa.length > 7) {
+
+        alert("A placa deve ter no máximo 7 caracteres!");
+
         return;
     }
 
     // Verifica se já está estacionado
     for (let i = 0; i < veiculos.length; i++) {
 
-        if (veiculos[i].placa == placa) {
+        if (veiculos[i].placa === placa) {
+
             alert("Esse veículo já está estacionado!");
+
             return;
         }
     }
@@ -41,21 +71,19 @@ function registrarEntrada() {
     // Horário da entrada
     let entrada = new Date().getTime();
 
-    // Cria veículo
     let veiculo = {
+
         placa: placa,
+
         entrada: entrada
     };
 
     veiculos.push(veiculo);
 
-    // SALVA OS VEÍCULOS
     salvarDados();
 
-    // Limpa campo
-    document.getElementById("placaEntrada").value = "";
+    campo.value = "";
 
-    // Atualiza tela
     mostrarVeiculos();
 
     alert("Veículo registrado com sucesso!");
@@ -63,7 +91,7 @@ function registrarEntrada() {
 
 
 // ==========================================
-// MOSTRAR VEÍCULOS ESTACIONADOS
+// MOSTRAR VEÍCULOS
 // ==========================================
 
 function mostrarVeiculos() {
@@ -72,7 +100,7 @@ function mostrarVeiculos() {
 
     lista.innerHTML = "";
 
-    if (veiculos.length == 0) {
+    if (veiculos.length === 0) {
 
         lista.innerHTML =
             "<p>Não há veículos estacionados.</p>";
@@ -110,13 +138,23 @@ function mostrarVeiculos() {
 
 function registrarSaida() {
 
-    let placa = document.getElementById("placaSaida").value;
+    let campo = document.getElementById("placaSaida");
 
-    placa = placa.toUpperCase().trim();
+    let placa = formatarPlaca(campo.value);
 
-    if (placa == "") {
+    campo.value = placa;
+
+    if (placa === "") {
 
         alert("Digite a placa do veículo!");
+
+        return;
+    }
+
+    // Verifica limite
+    if (placa.length > 7) {
+
+        alert("A placa deve ter no máximo 7 caracteres!");
 
         return;
     }
@@ -125,7 +163,7 @@ function registrarSaida() {
 
     for (let i = 0; i < veiculos.length; i++) {
 
-        if (veiculos[i].placa == placa) {
+        if (veiculos[i].placa === placa) {
 
             encontrado = true;
 
@@ -143,8 +181,9 @@ function registrarSaida() {
             // Arredonda para cima
             horas = Math.ceil(horas);
 
-            // Pelo menos 1 hora
+            // Mínimo de 1 hora
             if (horas < 1) {
+
                 horas = 1;
             }
 
@@ -164,7 +203,7 @@ function registrarSaida() {
             }
 
             // ==================================
-            // CRIA REGISTRO DO HISTÓRICO
+            // CRIA HISTÓRICO
             // ==================================
 
             let registro = {
@@ -180,11 +219,10 @@ function registrarSaida() {
                 valor: valor
             };
 
-            // Adiciona ao histórico
             historico.push(registro);
 
             // ==================================
-            // SALVA O ÚLTIMO RESULTADO
+            // SALVA ÚLTIMO RESULTADO
             // ==================================
 
             ultimoResultado = {
@@ -197,37 +235,34 @@ function registrarSaida() {
             };
 
             // ==================================
-            // REMOVE DOS ESTACIONADOS
+            // REMOVE VEÍCULO
             // ==================================
 
             veiculos.splice(i, 1);
 
             // ==================================
-            // SALVA TUDO
+            // SALVA DADOS
             // ==================================
 
             salvarDados();
 
             // ==================================
-            // MOSTRA RESULTADO
+            // ATUALIZA TELA
             // ==================================
 
             mostrarResultado();
 
-            // Limpa campo
-            document.getElementById("placaSaida").value = "";
+            campo.value = "";
 
-            // Atualiza veículos
             mostrarVeiculos();
 
-            // Atualiza histórico
             mostrarHistorico();
 
             break;
         }
     }
 
-    if (encontrado == false) {
+    if (!encontrado) {
 
         alert("Veículo não encontrado.");
     }
@@ -235,7 +270,7 @@ function registrarSaida() {
 
 
 // ==========================================
-// MOSTRAR RESULTADO DA SAÍDA
+// MOSTRAR RESULTADO
 // ==========================================
 
 function mostrarResultado() {
@@ -262,7 +297,7 @@ function mostrarResultado() {
         "</p>" +
 
         "<p><strong>Valor a pagar:</strong> R$ " +
-        ultimoResultado.valor.toFixed(2) +
+        Number(ultimoResultado.valor).toFixed(2) +
         "</p>";
 }
 
@@ -277,7 +312,7 @@ function mostrarHistorico() {
 
     lista.innerHTML = "";
 
-    if (historico.length == 0) {
+    if (historico.length === 0) {
 
         lista.innerHTML =
             "<p>Não há histórico.</p>";
@@ -332,7 +367,7 @@ function mostrarHistorico() {
 
 
 // ==========================================
-// SALVAR TODOS OS DADOS
+// SALVAR DADOS
 // ==========================================
 
 function salvarDados() {
@@ -360,7 +395,7 @@ function salvarDados() {
 
 function limparHistorico() {
 
-    if (historico.length == 0) {
+    if (historico.length === 0) {
 
         alert("O histórico já está vazio.");
 
@@ -375,15 +410,12 @@ function limparHistorico() {
 
         historico = [];
 
-        // Apaga histórico salvo
-        localStorage.removeItem("historico");
-
-        // Também apaga o último resultado
         ultimoResultado = null;
+
+        localStorage.removeItem("historico");
 
         localStorage.removeItem("ultimoResultado");
 
-        // Atualiza tela
         mostrarHistorico();
 
         mostrarResultado();
@@ -394,11 +426,44 @@ function limparHistorico() {
 
 
 // ==========================================
-// CARREGA TUDO QUANDO O SITE ABRE
+// LIMITAÇÃO DOS CAMPOS DE PLACA
 // ==========================================
 
-mostrarVeiculos();
+document.addEventListener("DOMContentLoaded", function () {
 
-mostrarHistorico();
+    const placaEntrada =
+        document.getElementById("placaEntrada");
 
-mostrarResultado();
+    const placaSaida =
+        document.getElementById("placaSaida");
+
+
+    if (placaEntrada) {
+
+        placaEntrada.setAttribute("maxlength", "7");
+
+        placaEntrada.addEventListener("input", function () {
+
+            this.value = formatarPlaca(this.value);
+        });
+    }
+
+
+    if (placaSaida) {
+
+        placaSaida.setAttribute("maxlength", "7");
+
+        placaSaida.addEventListener("input", function () {
+
+            this.value = formatarPlaca(this.value);
+        });
+    }
+
+
+    // Carrega os dados na tela
+    mostrarVeiculos();
+
+    mostrarHistorico();
+
+    mostrarResultado();
+});
