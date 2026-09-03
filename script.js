@@ -67,7 +67,7 @@ for (let i = 0; i < veiculos.length; i++) {
 
     let placa = veiculos[i][0];
 
-    let entrada = veiculos[i][1];
+    let entrada = new Date(veiculos[i][1]);
 
     let horario = entrada.toLocaleTimeString("pt-BR");
 
@@ -114,7 +114,7 @@ for (let i = 0; i < veiculos.length; i++) {
 
 
         // Horário da entrada
-        let entrada = veiculos[i][1];
+        let entrada = new Date(veiculos[i][1]);
 
 
         // Calcula o tempo em milissegundos
