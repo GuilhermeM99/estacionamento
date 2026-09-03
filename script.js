@@ -1,16 +1,22 @@
+// ===============================
+// PEGAR DADOS SALVOS
+// ===============================
+
 let veiculos = JSON.parse(localStorage.getItem("veiculos")) || [];
 
 let historico = JSON.parse(localStorage.getItem("historico")) || [];
 
-console.log(veiculos);
-console.log(historico);
 
+// ===============================
+// REGISTRAR ENTRADA
+// ===============================
 
 function registrarEntrada() {
 
     let placa = document.getElementById("placaEntrada").value;
 
     placa = placa.toUpperCase();
+
 
     if (placa == "") {
 
@@ -38,21 +44,30 @@ function registrarEntrada() {
     let entrada = new Date();
 
 
-    // Guarda a placa e o horário
+    // Cria o veículo
 
     let veiculo = [placa, entrada];
 
 
+    // Coloca o veículo na lista
+
     veiculos.push(veiculo);
 
 
-    // Salva os veículos
+    // Salva no navegador
 
-    localStorage.setItem("veiculos", JSON.stringify(veiculos));
+    localStorage.setItem(
+        "veiculos",
+        JSON.stringify(veiculos)
+    );
 
+
+    // Limpa o campo
 
     document.getElementById("placaEntrada").value = "";
 
+
+    // Atualiza a lista
 
     mostrarVeiculos();
 
@@ -61,16 +76,23 @@ function registrarEntrada() {
 }
 
 
+
+// ===============================
+// MOSTRAR VEÍCULOS
+// ===============================
+
 function mostrarVeiculos() {
 
     let lista = document.getElementById("listaVeiculos");
+
 
     lista.innerHTML = "";
 
 
     if (veiculos.length == 0) {
 
-        lista.innerHTML = "<p>Não há veículos estacionados.</p>";
+        lista.innerHTML =
+            "<p>Não há veículos estacionados.</p>";
 
         return;
     }
@@ -82,23 +104,31 @@ function mostrarVeiculos() {
 
         let entrada = new Date(veiculos[i][1]);
 
-        let horario = entrada.toLocaleTimeString("pt-BR");
+        let horario =
+            entrada.toLocaleTimeString("pt-BR");
 
 
         lista.innerHTML +=
 
             "<div class='veiculo'>" +
 
-            "<strong>Placa:</strong> " + placa +
+            "<strong>Placa:</strong> " +
+            placa +
 
             "<br>" +
 
-            "<strong>Entrada:</strong> " + horario +
+            "<strong>Entrada:</strong> " +
+            horario +
 
             "</div>";
     }
 }
 
+
+
+// ===============================
+// REGISTRAR SAÍDA
+// ===============================
 
 function registrarSaida() {
 
@@ -132,10 +162,11 @@ function registrarSaida() {
 
             // Horário da entrada
 
-            let entrada = new Date(veiculos[i][1]);
+            let entrada =
+                new Date(veiculos[i][1]);
 
 
-            // Calcula o tempo em milissegundos
+            // Calcula o tempo
 
             let tempo = saida - entrada;
 
@@ -150,7 +181,7 @@ function registrarSaida() {
             horas = Math.ceil(horas);
 
 
-            // Garante pelo menos 1 hora
+            // Mínimo de 1 hora
 
             if (horas < 1) {
 
@@ -158,7 +189,9 @@ function registrarSaida() {
             }
 
 
-            // Calcula o valor
+            // ===============================
+            // CALCULA O VALOR
+            // ===============================
 
             let valor;
 
@@ -173,30 +206,15 @@ function registrarSaida() {
             }
 
 
-            // Mostra o resultado
-
-            document.getElementById("resultado").innerHTML =
-
-                "<h2>Saída</h2>" +
-
-                "<p><strong>Placa:</strong> " + placa + "</p>" +
-
-                "<p><strong>Horas:</strong> " + horas + "</p>" +
-
-                "<p><strong>Valor a pagar:</strong> R$ " +
-
-                valor.toFixed(2) +
-
-                "</p>";
-
-
-            // Coloca o veículo no histórico
+            // ===============================
+            // CRIA O HISTÓRICO
+            // ===============================
 
             let registro = {
 
                 placa: placa,
 
-                entrada: veiculos[i][1],
+                entrada: entrada,
 
                 saida: saida,
 
@@ -205,6 +223,8 @@ function registrarSaida() {
                 valor: valor
             };
 
+
+            // Coloca no histórico
 
             historico.push(registro);
 
@@ -217,12 +237,35 @@ function registrarSaida() {
             );
 
 
-            // Remove o veículo da lista
+            // ===============================
+            // MOSTRA O RESULTADO
+            // ===============================
+
+            document.getElementById("resultado").innerHTML =
+
+                "<h2>Saída</h2>" +
+
+                "<p><strong>Placa:</strong> " +
+                placa +
+                "</p>" +
+
+                "<p><strong>Horas:</strong> " +
+                horas +
+                "</p>" +
+
+                "<p><strong>Valor a pagar:</strong> R$ " +
+                valor.toFixed(2) +
+                "</p>";
+
+
+            // ===============================
+            // REMOVE DOS ESTACIONADOS
+            // ===============================
 
             veiculos.splice(i, 1);
 
 
-            // Salva novamente os veículos
+            // Salva novamente
 
             localStorage.setItem(
                 "veiculos",
@@ -230,10 +273,16 @@ function registrarSaida() {
             );
 
 
+            // Limpa o campo
+
             document.getElementById("placaSaida").value = "";
 
 
+            // Atualiza as duas listas
+
             mostrarVeiculos();
+
+            mostrarHistorico();
 
 
             break;
@@ -248,6 +297,85 @@ function registrarSaida() {
 }
 
 
-// Mostra a lista quando o site abre
+
+// ===============================
+// MOSTRAR HISTÓRICO
+// ===============================
+
+function mostrarHistorico() {
+
+    let lista =
+        document.getElementById("listaHistorico");
+
+
+    lista.innerHTML = "";
+
+
+    if (historico.length == 0) {
+
+        lista.innerHTML =
+            "<p>Não há histórico.</p>";
+
+        return;
+    }
+
+
+    for (let i = 0; i < historico.length; i++) {
+
+
+        let entrada =
+            new Date(historico[i].entrada);
+
+
+        let saida =
+            new Date(historico[i].saida);
+
+
+        let horarioEntrada =
+            entrada.toLocaleTimeString("pt-BR");
+
+
+        let horarioSaida =
+            saida.toLocaleTimeString("pt-BR");
+
+
+        lista.innerHTML +=
+
+            "<div class='veiculo'>" +
+
+            "<strong>Placa:</strong> " +
+            historico[i].placa +
+
+            "<br>" +
+
+            "<strong>Entrada:</strong> " +
+            horarioEntrada +
+
+            "<br>" +
+
+            "<strong>Saída:</strong> " +
+            horarioSaida +
+
+            "<br>" +
+
+            "<strong>Horas:</strong> " +
+            historico[i].horas +
+
+            "<br>" +
+
+            "<strong>Valor:</strong> R$ " +
+            historico[i].valor.toFixed(2) +
+
+            "</div>";
+    }
+}
+
+
+
+// ===============================
+// QUANDO ABRIR O SITE
+// ===============================
 
 mostrarVeiculos();
+
+mostrarHistorico();
