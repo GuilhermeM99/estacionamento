@@ -2,11 +2,16 @@
 // CARREGA OS DADOS SALVOS
 // ==========================================
 
-// Veículos que estão atualmente estacionados
+// Veículos atualmente estacionados
 let veiculos = JSON.parse(localStorage.getItem("veiculos")) || [];
 
 // Histórico dos veículos que já saíram
 let historico = JSON.parse(localStorage.getItem("historico")) || [];
+
+// Último resultado exibido
+let ultimoResultado = JSON.parse(
+    localStorage.getItem("ultimoResultado")
+) || null;
 
 
 // ==========================================
@@ -15,66 +20,43 @@ let historico = JSON.parse(localStorage.getItem("historico")) || [];
 
 function registrarEntrada() {
 
-    // Pega a placa digitada
     let placa = document.getElementById("placaEntrada").value;
 
-    // Coloca a placa em letras maiúsculas
     placa = placa.toUpperCase().trim();
 
-
-    // Verifica se o usuário digitou alguma coisa
     if (placa == "") {
-
         alert("Digite a placa do veículo!");
-
         return;
     }
 
-
-    // Verifica se o veículo já está estacionado
+    // Verifica se já está estacionado
     for (let i = 0; i < veiculos.length; i++) {
 
         if (veiculos[i].placa == placa) {
-
             alert("Esse veículo já está estacionado!");
-
             return;
         }
     }
 
-
-    // Pega o horário atual
+    // Horário da entrada
     let entrada = new Date().getTime();
 
-
-    // Cria o veículo
+    // Cria veículo
     let veiculo = {
-
         placa: placa,
-
         entrada: entrada
-
     };
 
-
-    // Adiciona o veículo na lista
     veiculos.push(veiculo);
 
+    // SALVA OS VEÍCULOS
+    salvarDados();
 
-    // Salva os veículos no navegador
-    localStorage.setItem(
-        "veiculos",
-        JSON.stringify(veiculos)
-    );
-
-
-    // Limpa o campo
+    // Limpa campo
     document.getElementById("placaEntrada").value = "";
 
-
-    // Atualiza a lista
+    // Atualiza tela
     mostrarVeiculos();
-
 
     alert("Veículo registrado com sucesso!");
 }
@@ -88,12 +70,8 @@ function mostrarVeiculos() {
 
     let lista = document.getElementById("listaVeiculos");
 
-
-    // Limpa a lista
     lista.innerHTML = "";
 
-
-    // Verifica se não existem veículos
     if (veiculos.length == 0) {
 
         lista.innerHTML =
@@ -102,22 +80,15 @@ function mostrarVeiculos() {
         return;
     }
 
-
-    // Percorre todos os veículos
     for (let i = 0; i < veiculos.length; i++) {
 
         let placa = veiculos[i].placa;
 
         let entrada = new Date(veiculos[i].entrada);
 
-
-        // Formata o horário
         let horario = entrada.toLocaleTimeString("pt-BR");
 
-
-        // Mostra o veículo
         lista.innerHTML +=
-
             "<div class='veiculo'>" +
 
             "<strong>Placa:</strong> " +
@@ -139,15 +110,10 @@ function mostrarVeiculos() {
 
 function registrarSaida() {
 
-    // Pega a placa digitada
     let placa = document.getElementById("placaSaida").value;
 
-
-    // Coloca em letras maiúsculas
     placa = placa.toUpperCase().trim();
 
-
-    // Verifica se digitou alguma placa
     if (placa == "") {
 
         alert("Digite a placa do veículo!");
@@ -155,61 +121,38 @@ function registrarSaida() {
         return;
     }
 
-
-    // Procura o veículo
     let encontrado = false;
 
-
     for (let i = 0; i < veiculos.length; i++) {
-
 
         if (veiculos[i].placa == placa) {
 
             encontrado = true;
 
-
-            // ==================================
-            // HORÁRIO DA SAÍDA
-            // ==================================
-
+            // Horário da saída
             let saida = new Date().getTime();
 
-
-            // ==================================
-            // HORÁRIO DA ENTRADA
-            // ==================================
-
+            // Horário da entrada
             let entrada = veiculos[i].entrada;
 
-
-            // ==================================
-            // CALCULA O TEMPO
-            // ==================================
-
+            // Calcula tempo
             let tempo = saida - entrada;
 
-
-            // Converte para horas
             let horas = tempo / 3600000;
-
 
             // Arredonda para cima
             horas = Math.ceil(horas);
 
-
-            // Garante pelo menos 1 hora
+            // Pelo menos 1 hora
             if (horas < 1) {
-
                 horas = 1;
             }
 
-
             // ==================================
-            // CALCULA O VALOR
+            // CALCULA VALOR
             // ==================================
 
             let valor;
-
 
             if (horas <= 1) {
 
@@ -218,9 +161,7 @@ function registrarSaida() {
             } else {
 
                 valor = 15 + (horas - 1) * 3;
-
             }
-
 
             // ==================================
             // CRIA REGISTRO DO HISTÓRICO
@@ -237,41 +178,23 @@ function registrarSaida() {
                 horas: horas,
 
                 valor: valor
-
             };
 
-
-            // Adiciona no histórico
+            // Adiciona ao histórico
             historico.push(registro);
 
-
-            // Salva o histórico
-            localStorage.setItem(
-                "historico",
-                JSON.stringify(historico)
-            );
-
-
             // ==================================
-            // MOSTRA O RESULTADO
+            // SALVA O ÚLTIMO RESULTADO
             // ==================================
 
-            document.getElementById("resultado").innerHTML =
+            ultimoResultado = {
 
-                "<h2>Saída</h2>" +
+                placa: placa,
 
-                "<p><strong>Placa:</strong> " +
-                placa +
-                "</p>" +
+                horas: horas,
 
-                "<p><strong>Horas:</strong> " +
-                horas +
-                "</p>" +
-
-                "<p><strong>Valor a pagar:</strong> R$ " +
-                valor.toFixed(2) +
-                "</p>";
-
+                valor: valor
+            };
 
             // ==================================
             // REMOVE DOS ESTACIONADOS
@@ -279,39 +202,68 @@ function registrarSaida() {
 
             veiculos.splice(i, 1);
 
+            // ==================================
+            // SALVA TUDO
+            // ==================================
 
-            // Salva novamente os estacionados
-            localStorage.setItem(
-                "veiculos",
-                JSON.stringify(veiculos)
-            );
+            salvarDados();
 
+            // ==================================
+            // MOSTRA RESULTADO
+            // ==================================
 
-            // Limpa o campo
+            mostrarResultado();
+
+            // Limpa campo
             document.getElementById("placaSaida").value = "";
-
 
             // Atualiza veículos
             mostrarVeiculos();
 
-
             // Atualiza histórico
             mostrarHistorico();
-
 
             break;
         }
     }
 
-
-    // ==================================
-    // VEÍCULO NÃO ENCONTRADO
-    // ==================================
-
     if (encontrado == false) {
 
         alert("Veículo não encontrado.");
     }
+}
+
+
+// ==========================================
+// MOSTRAR RESULTADO DA SAÍDA
+// ==========================================
+
+function mostrarResultado() {
+
+    let resultado = document.getElementById("resultado");
+
+    if (!ultimoResultado) {
+
+        resultado.innerHTML = "";
+
+        return;
+    }
+
+    resultado.innerHTML =
+
+        "<h2>Saída</h2>" +
+
+        "<p><strong>Placa:</strong> " +
+        ultimoResultado.placa +
+        "</p>" +
+
+        "<p><strong>Horas:</strong> " +
+        ultimoResultado.horas +
+        "</p>" +
+
+        "<p><strong>Valor a pagar:</strong> R$ " +
+        ultimoResultado.valor.toFixed(2) +
+        "</p>";
 }
 
 
@@ -323,12 +275,8 @@ function mostrarHistorico() {
 
     let lista = document.getElementById("listaHistorico");
 
-
-    // Limpa a lista
     lista.innerHTML = "";
 
-
-    // Verifica se não existe histórico
     if (historico.length == 0) {
 
         lista.innerHTML =
@@ -337,28 +285,20 @@ function mostrarHistorico() {
         return;
     }
 
-
-    // Percorre o histórico
     for (let i = 0; i < historico.length; i++) {
 
         let registro = historico[i];
 
-
-        // Converte os horários
         let entrada = new Date(registro.entrada);
 
         let saida = new Date(registro.saida);
 
-
-        // Formata data e hora
         let horarioEntrada =
             entrada.toLocaleString("pt-BR");
 
         let horarioSaida =
             saida.toLocaleString("pt-BR");
 
-
-        // Mostra na tela
         lista.innerHTML +=
 
             "<div class='veiculo'>" +
@@ -384,10 +324,33 @@ function mostrarHistorico() {
             "<br>" +
 
             "<strong>Valor:</strong> R$ " +
-            registro.valor.toFixed(2) +
+            Number(registro.valor).toFixed(2) +
 
             "</div>";
     }
+}
+
+
+// ==========================================
+// SALVAR TODOS OS DADOS
+// ==========================================
+
+function salvarDados() {
+
+    localStorage.setItem(
+        "veiculos",
+        JSON.stringify(veiculos)
+    );
+
+    localStorage.setItem(
+        "historico",
+        JSON.stringify(historico)
+    );
+
+    localStorage.setItem(
+        "ultimoResultado",
+        JSON.stringify(ultimoResultado)
+    );
 }
 
 
@@ -397,7 +360,6 @@ function mostrarHistorico() {
 
 function limparHistorico() {
 
-    // Verifica se existe histórico
     if (historico.length == 0) {
 
         alert("O histórico já está vazio.");
@@ -405,26 +367,26 @@ function limparHistorico() {
         return;
     }
 
-
-    // Pergunta antes de apagar
     let confirmar = confirm(
         "Tem certeza que deseja apagar todo o histórico?"
     );
 
-
     if (confirmar) {
 
-        // Apaga o histórico
         historico = [];
 
-
-        // Remove do navegador
+        // Apaga histórico salvo
         localStorage.removeItem("historico");
 
+        // Também apaga o último resultado
+        ultimoResultado = null;
 
-        // Atualiza a tela
+        localStorage.removeItem("ultimoResultado");
+
+        // Atualiza tela
         mostrarHistorico();
 
+        mostrarResultado();
 
         alert("Histórico apagado com sucesso!");
     }
@@ -438,3 +400,5 @@ function limparHistorico() {
 mostrarVeiculos();
 
 mostrarHistorico();
+
+mostrarResultado();
